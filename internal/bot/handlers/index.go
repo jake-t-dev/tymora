@@ -5,5 +5,6 @@ import "github.com/bwmarrin/discordgo"
 func AddHandlers(dg *discordgo.Session) (*discordgo.Session, error) {
 	dg.AddHandler(test)
 	dg.AddHandler(roll)
+	dg.AddHandler(about)
 	return dg, nil
 }

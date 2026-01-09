@@ -10,20 +10,21 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var rollRegex = regexp.MustCompile(`^!roll\s+(\d+)d(\d+)(?:([+-])(\d+))?$`)
+var rollRegex = regexp.MustCompile(`^!(?:roll|r)\s+(\d+)d(\d+)(?:([+-])(\d+))?$`)
 
 func roll(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
 
-	if !strings.HasPrefix(m.Content, "!roll") {
+	if !strings.HasPrefix(m.Content, "!roll ") && m.Content != "!roll" &&
+		!strings.HasPrefix(m.Content, "!r ") && m.Content != "!r" {
 		return
 	}
 
 	matches := rollRegex.FindStringSubmatch(m.Content)
 	if len(matches) < 3 {
-		s.ChannelMessageSend(m.ChannelID, "Usage: !roll <number_of_dice>d<sides>[+/-modifier] (e.g., !roll 5d20+10)")
+		s.ChannelMessageSend(m.ChannelID, "Usage: !roll (or !r) <number_of_dice>d<sides>[+/-modifier] (e.g., !roll 5d20+10)")
 		return
 	}
 

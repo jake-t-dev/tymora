@@ -6,5 +6,6 @@ a simple D&D dice bot
 
 ## usage
 
-* `!test` - returns "test", uptime check for bot
-* `!roll` - rolls the specified number of dice with given modifiers, eg `!roll 2d6+4`
+* `!test` - returns repo link, status check for bot
+* `!roll` (alias `!r`) - rolls the specified number of dice with given modifiers, eg `!roll 2d6+4`
+* `!about` - shows a list of available commands
