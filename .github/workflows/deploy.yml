@@ -39,6 +39,19 @@ jobs:
       run: |-
         gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
+    - name: Ensure Artifact Registry repo exists
+      run: |
+        if ! gcloud artifacts repositories describe ${{ env.REPOSITORY }} \
+          --location=${{ env.GCP_REGION }} >/dev/null 2>&1; then
+          echo "Repository not found, creating ${{ env.REPOSITORY }}..."
+          gcloud artifacts repositories create ${{ env.REPOSITORY }} \
+            --repository-format=docker \
+            --location=${{ env.GCP_REGION }} \
+            --description="Docker repo for CI deploys"
+        else
+          echo "Repository ${{ env.REPOSITORY }} already exists."
+        fi
+
     - name: Build and Push Container
       run: |-
         DOCKER_TAG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.sha }}"
