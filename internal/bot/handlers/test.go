@@ -8,7 +8,7 @@ func test(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "test" {
+	if m.Content == "!test" {
 
 		s.ChannelMessageSend(m.ChannelID, "test")
 	}
