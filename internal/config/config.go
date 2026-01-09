@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -11,6 +13,8 @@ type Config struct {
 }
 
 func NewConfig(ctx context.Context) (context.Context, error) {
+	_ = godotenv.Load()
+
 	token := os.Getenv("DISCORD_TOKEN")
 	if token == "" {
 		return ctx, fmt.Errorf("DISCORD_TOKEN environment variable is not set")

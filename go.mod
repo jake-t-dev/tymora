@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/bwmarrin/discordgo v0.29.0
-	github.com/jake-t-dev/docker-discord-go v0.0.0-20250603182411-45c044235ac1
+	github.com/joho/godotenv v1.5.1
 )
 
 require (

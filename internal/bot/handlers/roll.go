@@ -10,7 +10,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var rollRegex = regexp.MustCompile(`^!roll\s+(\d+)d(\d+)$`)
+var rollRegex = regexp.MustCompile(`^!roll\s+(\d+)d(\d+)(?:([+-])(\d+))?$`)
 
 func roll(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
@@ -22,8 +22,8 @@ func roll(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	matches := rollRegex.FindStringSubmatch(m.Content)
-	if len(matches) != 3 {
-		s.ChannelMessageSend(m.ChannelID, "Usage: !roll <number_of_dice>d<sides> (e.g., !roll 5d20)")
+	if len(matches) < 3 {
+		s.ChannelMessageSend(m.ChannelID, "Usage: !roll <number_of_dice>d<sides>[+/-modifier] (e.g., !roll 5d20+10)")
 		return
 	}
 
@@ -44,6 +44,21 @@ func roll(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// Parse modifier if exists
+	modifier := 0
+	modifierStr := ""
+	if len(matches) == 5 && matches[3] != "" && matches[4] != "" {
+		modValue, err := strconv.Atoi(matches[4])
+		if err == nil {
+			if matches[3] == "+" {
+				modifier = modValue
+			} else {
+				modifier = -modValue
+			}
+			modifierStr = matches[3] + matches[4]
+		}
+	}
+
 	var rolls []string
 	total := 0
 	for i := 0; i < numDice; i++ {
@@ -52,12 +67,13 @@ func roll(s *discordgo.Session, m *discordgo.MessageCreate) {
 		total += roll
 	}
 
-	response := fmt.Sprintf("%s rolled %dd%d: [%s] (Total: %d)",
-		m.Author.Mention(), numDice, sides, strings.Join(rolls, ", "), total)
+	finalTotal := total + modifier
+	response := fmt.Sprintf("%s rolled %dd%d%s: [%s] (Total: %d)",
+		m.Author.Mention(), numDice, sides, modifierStr, strings.Join(rolls, ", "), finalTotal)
 
 	if len(response) > 2000 {
-		response = fmt.Sprintf("%s rolled %dd%d: (Total: %d) (Rolls were too long to display)",
-			m.Author.Mention(), numDice, sides, total)
+		response = fmt.Sprintf("%s rolled %dd%d%s: (Total: %d) (Rolls were too long to display)",
+			m.Author.Mention(), numDice, sides, modifierStr, finalTotal)
 	}
 
 	s.ChannelMessageSend(m.ChannelID, response)
