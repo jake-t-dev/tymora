@@ -6,11 +6,13 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 var rollRegex = regexp.MustCompile(`^!(?:roll|r)\s+(\d+)d(\d+)(?:([+-])(\d+))?$`)
+var localRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func roll(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
@@ -63,7 +65,7 @@ func roll(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var rolls []string
 	total := 0
 	for i := 0; i < numDice; i++ {
-		roll := rand.Intn(sides) + 1
+		roll := localRand.Intn(sides) + 1
 		rolls = append(rolls, strconv.Itoa(roll))
 		total += roll
 	}
